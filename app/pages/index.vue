@@ -107,7 +107,7 @@ const topCats = computed(() => {
 const topMax = computed(() => Math.max(1, ...topCats.value.map((c) => c.real)))
 
 function getVar(n: string) {
-  return typeof document !== 'undefined' ? getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#008C15' : '#008C15'
+  return typeof document !== 'undefined' ? getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#00573F' : '#00573F'
 }
 const periodLabel = computed(() => range.value.months.length === 1 ? monthLong(range.value.months[0]) : `${monthLong(range.value.months[0])} a ${monthLong(range.value.months.at(-1)!)}`)
 </script>

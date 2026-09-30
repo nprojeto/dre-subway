@@ -1,9 +1,9 @@
 /* ============ Identidade visual ============ */
 :root {
-  --green: #008C15;
-  --green-dark: #00391A;
-  --green-soft: #E6F3E8;
-  --yellow: #FFC20E;
+  --green: #00573F;
+  --green-dark: #003B2B;
+  --green-soft: #E2F0E9;
+  --yellow: #FFE500;
   --yellow-soft: #FFF6D6;
   --bg: #F2F5F0;
   --surface: #FFFFFF;
@@ -12,7 +12,7 @@
   --line: #DCE4D9;
   --red: #C62828;
   --red-soft: #FDECEC;
-  --pos: #0E7A2C;
+  --pos: #0B7A45;
   --radius: 14px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(0, 57, 26, .06), 0 6px 18px rgba(0, 57, 26, .05);

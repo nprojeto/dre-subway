@@ -4,7 +4,7 @@ const api = useApi()
 const toast = useToast()
 const s = app.data.value.settings
 const brand = ref({ name: '', subtitle: '', logo: null as string | null, ...(s.app ?? {}) })
-const tema = ref({ primary: '#008C15', secondary: '#FFC20E', dark: '#00391A', ...(s.tema ?? {}) })
+const tema = ref({ primary: '#00573F', secondary: '#FFE500', dark: '#003B2B', ...(s.tema ?? {}) })
 const ia = ref({ model: 'claude-sonnet-5', ...(s.ia ?? {}) })
 const saving = ref(false)
 
@@ -36,7 +36,7 @@ async function save() {
     toast.ok('Parâmetros salvos')
   } catch (e: any) { toast.bad(e) } finally { saving.value = false }
 }
-function resetColors() { tema.value = { primary: '#008C15', secondary: '#FFC20E', dark: '#00391A' } }
+function resetColors() { tema.value = { primary: '#00573F', secondary: '#FFE500', dark: '#003B2B' } }
 </script>
 
 <template>

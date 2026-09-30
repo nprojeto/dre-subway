@@ -6,11 +6,11 @@ export default defineNuxtConfig({
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL || '/',
     head: {
-      title: 'Fluxo de Caixa',
+      title: 'DRE SUBWAY',
       htmlAttrs: { lang: 'pt-BR' },
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'theme-color', content: '#00391A' },
+        { name: 'theme-color', content: '#003B2B' },
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

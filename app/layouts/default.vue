@@ -21,6 +21,7 @@ const nav = computed(() => {
   return items.filter((i) => (!i.admin || d.isAdmin) && (!i.write || d.canWrite))
 })
 
+const defLogo = useRuntimeConfig().app.baseURL + 'logo.png'
 const brand = computed(() => app.data.value.settings?.app ?? {})
 const roleLabel: Record<string, string> = { admin: 'Administrador', gestor: 'Gestor', visualizador: 'Visualizador' }
 
@@ -35,12 +36,9 @@ async function logout() {
   <div class="shell">
     <aside class="side" :class="{ open: menuOpen }">
       <div class="brand">
-        <img v-if="brand.logo" :src="brand.logo" alt="" class="brand-logo">
-        <div v-else class="brand-mark" aria-hidden="true"><span /><span /></div>
-        <div>
-          <strong>{{ brand.name || 'Fluxo de Caixa' }}</strong>
-          <small>{{ brand.subtitle || 'Rede de lojas' }}</small>
-        </div>
+        <div class="brand-card"><img :src="brand.logo || defLogo" alt="Logo"></div>
+        <strong>{{ brand.name || 'DRE SUBWAY' }}</strong>
+        <small>{{ brand.subtitle || 'O controle da sua loja na palma da mão' }}</small>
       </div>
       <nav>
         <NuxtLink v-for="i in nav" :key="i.to" :to="i.to" class="nav-i" :class="{ on: route.path === i.to }">
@@ -67,13 +65,11 @@ async function logout() {
 <style scoped>
 .shell { display: flex; min-height: 100vh; }
 .side { width: 248px; flex: none; background: var(--green-dark); color: #fff; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; padding: 18px 12px; }
-.brand { display: flex; align-items: center; gap: 12px; padding: 4px 8px 22px; }
-.brand strong { display: block; font-family: var(--display); font-size: 20px; line-height: 1.1; }
-.brand small { color: rgba(255,255,255,.6); font-size: 12.5px; }
-.brand-logo { width: 44px; height: 44px; object-fit: contain; border-radius: 10px; background: #fff; padding: 4px; }
-.brand-mark { width: 44px; height: 44px; border-radius: 12px; background: var(--green); display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 0 9px; }
-.brand-mark span { height: 6px; border-radius: 4px; background: var(--yellow); }
-.brand-mark span:first-child { width: 70%; }
+.brand { padding: 2px 6px 20px; }
+.brand-card { background: #fff; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; }
+.brand-card img { display: block; width: 100%; height: auto; }
+.brand strong { display: block; font-family: var(--display); font-size: 22px; line-height: 1.1; letter-spacing: .5px; }
+.brand small { color: rgba(255,255,255,.65); font-size: 12.5px; line-height: 1.3; display: block; margin-top: 2px; }
 nav { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-y: auto; }
 .nav-i { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,.78); font-weight: 500; position: relative; }
 .nav-i:hover { background: rgba(255,255,255,.07); color: #fff; }
