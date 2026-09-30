@@ -21,7 +21,6 @@ const nav = computed(() => {
   return items.filter((i) => (!i.admin || d.isAdmin) && (!i.write || d.canWrite))
 })
 
-const defLogo = useRuntimeConfig().app.baseURL + 'logo.png'
 const brand = computed(() => app.data.value.settings?.app ?? {})
 const roleLabel: Record<string, string> = { admin: 'Administrador', gestor: 'Gestor', visualizador: 'Visualizador' }
 
@@ -36,7 +35,7 @@ async function logout() {
   <div class="shell">
     <aside class="side" :class="{ open: menuOpen }">
       <div class="brand">
-        <div class="brand-card"><img :src="brand.logo || defLogo" alt="Logo"></div>
+        <div class="brand-card"><LogoRotator :extra="brand.logo" :height="56" /></div>
         <strong>{{ brand.name || 'DRE SUBWAY' }}</strong>
         <small>{{ brand.subtitle || 'O controle da sua loja na palma da mão' }}</small>
       </div>
@@ -67,7 +66,6 @@ async function logout() {
 .side { width: 248px; flex: none; background: var(--green-dark); color: #fff; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; padding: 18px 12px; }
 .brand { padding: 2px 6px 20px; }
 .brand-card { background: #fff; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; }
-.brand-card img { display: block; width: 100%; height: auto; }
 .brand strong { display: block; font-family: var(--display); font-size: 22px; line-height: 1.1; letter-spacing: .5px; }
 .brand small { color: rgba(255,255,255,.65); font-size: 12.5px; line-height: 1.3; display: block; margin-top: 2px; }
 nav { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-y: auto; }

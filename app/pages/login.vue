@@ -5,7 +5,7 @@ const password = ref('')
 const loading = ref(false)
 const error = ref('')
 const brand = ref<any>({})
-const defLogo = useRuntimeConfig().app.baseURL + 'logo.png'
+const defS = useRuntimeConfig().app.baseURL + 'logo-s.png'
 
 onMounted(async () => {
   try {
@@ -28,14 +28,14 @@ async function enter() {
 <template>
   <div class="lg">
     <div class="lg-art" aria-hidden="true">
-      <div class="stripe s1" /><div class="stripe s2" /><div class="stripe s3" />
+      <img :src="defS" alt="" class="lg-s">
       <div class="lg-quote">
         <span>O controle da sua loja</span>
         <strong>na palma da sua mão.</strong>
       </div>
     </div>
     <form class="lg-box" @submit.prevent="enter">
-      <img :src="brand.logo || defLogo" alt="Logo" class="lg-logo">
+      <LogoRotator :extra="brand.logo" :height="96" class="lg-logo" />
       <h1>{{ brand.name || 'DRE SUBWAY' }}</h1>
       <p class="muted">{{ brand.subtitle || 'O controle da sua loja na palma da mão' }}</p>
       <label class="f">E-mail <input v-model="email" type="email" autocomplete="username" required></label>
@@ -49,16 +49,14 @@ async function enter() {
 
 <style scoped>
 .lg { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; background: #fff; }
-.lg-art { background: var(--green-dark); position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 56px; }
-.stripe { position: absolute; left: -10%; width: 130%; height: 70px; border-radius: 40px; transform: rotate(-14deg); }
-.s1 { top: 16%; background: var(--green); }
-.s2 { top: 30%; background: var(--yellow); width: 90%; }
-.s3 { top: 44%; background: #fff; opacity: .9; width: 70%; }
-.lg-quote { position: relative; color: #fff; font-family: var(--display); line-height: 1.02; }
-.lg-quote span { display: block; font-size: 38px; font-weight: 600; }
-.lg-quote strong { display: block; font-size: 54px; font-weight: 700; color: var(--yellow); }
+.lg-art { background: var(--bg); position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding: 56px; }
+.lg-s { width: min(52%, 340px); height: auto; filter: drop-shadow(0 18px 30px rgba(0, 59, 43, .15)); animation: pop .9s ease both; }
+@keyframes pop { from { opacity: 0; transform: scale(.92) rotate(-4deg); } to { opacity: 1; transform: none; } }
+.lg-quote { color: var(--green-dark); font-family: var(--display); line-height: 1.02; text-align: center; }
+.lg-quote span { display: block; font-size: 36px; font-weight: 600; }
+.lg-quote strong { display: block; font-size: 52px; font-weight: 700; color: var(--green); }
 .lg-box { align-self: center; justify-self: center; width: 100%; max-width: 400px; padding: 32px; display: grid; gap: 14px; }
-.lg-logo { width: 100%; max-width: 280px; height: auto; margin-bottom: 6px; }
+.lg-logo { max-width: 300px; margin-bottom: 6px; }
 .lg-box h1 { font-size: 40px; color: var(--green-dark); }
 .lg-box p { margin: -8px 0 6px; }
 @media (max-width: 860px) { .lg { grid-template-columns: 1fr; } .lg-art { display: none; } }
