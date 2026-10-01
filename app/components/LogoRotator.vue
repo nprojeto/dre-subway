@@ -2,7 +2,7 @@
 /** Alterna entre os logos com transição suave. */
 const props = defineProps<{ extra?: string | null; height?: number; interval?: number }>()
 const base = useRuntimeConfig().app.baseURL
-const list = computed(() => [props.extra, `${base}logo.png`, `${base}logo-sw.svg`, `${base}logo-s.png`].filter(Boolean) as string[])
+const list = computed(() => [props.extra, `${base}logo-sw.svg`, `${base}logo-s.png`].filter(Boolean) as string[])
 const i = ref(0)
 let t: any
 onMounted(() => { t = setInterval(() => (i.value = (i.value + 1) % list.value.length), props.interval ?? 5000) })
