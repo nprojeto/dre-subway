@@ -6,7 +6,9 @@ const route = useRoute()
 const router = useRouter()
 
 const isAdmin = computed(() => app.data.value.isAdmin)
+const isManager = computed(() => app.data.value.isManager)
 const tabs = computed(() => [
+  ...(isAdmin.value ? [{ k: 'empresas', label: 'Empresas' }] : []),
   { k: 'lojas', label: 'Lojas' },
   { k: 'contas', label: 'Contas bancárias' },
   { k: 'bancos', label: 'Bancos' },
@@ -14,10 +16,12 @@ const tabs = computed(() => [
   { k: 'categorias', label: 'Categorias' },
 ])
 const tab = computed({
-  get: () => String(route.query.tab || 'lojas'),
+  get: () => String(route.query.tab || (isAdmin.value ? 'empresas' : 'lojas')),
   set: (v) => router.replace({ query: { tab: v } }),
 })
 const reload = () => app.load()
+const { f } = useFilters()
+const accDefaults = computed(() => ({ store_id: f.value.stores.length === 1 ? f.value.stores[0] : null }))
 
 const kinds = [
   { value: 'receita', label: 'Receita' },
@@ -27,14 +31,25 @@ const kinds = [
 ]
 const dirs = [{ value: 'entrada', label: 'Entrada' }, { value: 'saida', label: 'Saída' }]
 
-const storeFields = [
+const companyFields = [
+  { key: 'name', label: 'Nome da empresa / grupo', required: true, help: 'Ex.: Grupo do empresário João (dono de várias lojas).' },
+  { key: 'cnpj', label: 'CNPJ', half: true },
+  { key: 'active', label: 'Ativa', type: 'bool' },
+]
+const storeFields = computed(() => [
+  ...(isAdmin.value ? [{
+    key: 'company_id', label: 'Empresa (dono)', type: 'select', half: true,
+    options: app.data.value.companies.map((c) => ({ value: c.id, label: c.name })),
+    show: (r: any) => app.companyMap.value[r.company_id]?.name ?? 'Sem empresa',
+    help: 'O empresário dessa empresa enxerga esta loja.',
+  }] : []),
   { key: 'code', label: 'Código', half: true },
   { key: 'name', label: 'Nome da loja', required: true },
   { key: 'city', label: 'Cidade', half: true },
   { key: 'state', label: 'UF', half: true },
   { key: 'cnpj', label: 'CNPJ', half: true, list: false },
   { key: 'active', label: 'Ativa', type: 'bool' },
-]
+])
 const accountFields = computed(() => [
   { key: 'store_id', label: 'Loja', type: 'store', required: true },
   { key: 'bank_id', label: 'Banco', type: 'select', options: app.data.value.banks.filter((b) => b.active).map((b) => ({ value: b.id, label: b.name })), half: true },
@@ -80,8 +95,9 @@ const accListFields = computed(() => accountFields.value.map((f) =>
 // importação de lojas em massa
 const bulk = ref<string | null>(null)
 const bulkSaving = ref(false)
+const bulkCompany = ref<string | null>(null)
 const bulkRows = computed(() => (bulk.value ?? '').split('\n').map((l) => l.split(/[;\t]/).map((s) => s.trim()))
-  .filter((c) => c[1] || c[0]).map((c) => ({ code: c[0] || null, name: c[1] || c[0], city: c[2] || null, state: c[3] || null, active: true })))
+  .filter((c) => c[1] || c[0]).map((c) => ({ code: c[0] || null, name: c[1] || c[0], city: c[2] || null, state: c[3] || null, company_id: bulkCompany.value, active: true })))
 async function bulkSave() {
   bulkSaving.value = true
   try {
@@ -107,20 +123,29 @@ async function bulkSave() {
       <button v-for="t in tabs" :key="t.k" :class="{ on: tab === t.k }" @click="tab = t.k">{{ t.label }}</button>
     </div>
 
-    <CrudEditor v-if="tab === 'lojas'" table="stores" singular="Loja" :fields="storeFields" :rows="app.data.value.stores" :readonly="!isAdmin" @changed="reload">
+    <CrudEditor v-if="tab === 'empresas' && isAdmin" table="companies" singular="Empresa" new-label="Nova empresa" :fields="companyFields" :rows="app.data.value.companies" @changed="reload" />
+    <CrudEditor v-if="tab === 'lojas'" table="stores" singular="Loja" new-label="Nova loja" :fields="storeFields" :rows="app.data.value.stores" :readonly="!isManager" @changed="reload">
       <template #actions>
-        <button v-if="isAdmin" class="btn ghost" @click="bulk = ''">Colar lista de lojas</button>
+        <button v-if="isManager" class="btn ghost" @click="bulk = ''">Colar lista de lojas</button>
       </template>
     </CrudEditor>
-    <CrudEditor v-if="tab === 'contas'" table="accounts" singular="Conta" :fields="accListFields" :rows="accountsSorted" :readonly="!app.data.value.canWrite" @changed="reload" />
-    <CrudEditor v-if="tab === 'bancos'" table="banks" singular="Banco" :fields="bankFields" :rows="app.data.value.banks" :readonly="!isAdmin" @changed="reload" />
-    <CrudEditor v-if="tab === 'grupos'" table="category_groups" singular="Grupo" :fields="groupFields" :rows="app.groupsSorted.value" :readonly="!isAdmin" @changed="reload" />
-    <CrudEditor v-if="tab === 'categorias'" table="categories" singular="Categoria" :fields="catListFields" :rows="catsSorted" :readonly="!isAdmin" @changed="reload" />
+    <CrudEditor v-if="tab === 'contas'" table="accounts" singular="Conta" new-label="Nova conta bancária" :defaults="accDefaults" :fields="accListFields" :rows="accountsSorted" :readonly="!app.data.value.canWrite" @changed="reload">
+      <template #actions><span class="small muted">Uma loja pode ter várias contas, uma para cada banco.</span></template>
+    </CrudEditor>
+    <CrudEditor v-if="tab === 'bancos'" table="banks" singular="Banco" new-label="Novo banco" :fields="bankFields" :rows="app.data.value.banks" :readonly="!isAdmin" @changed="reload" />
+    <CrudEditor v-if="tab === 'grupos'" table="category_groups" singular="Grupo" new-label="Novo grupo" :fields="groupFields" :rows="app.groupsSorted.value" :readonly="!isAdmin" @changed="reload" />
+    <CrudEditor v-if="tab === 'categorias'" table="categories" singular="Categoria" new-label="Nova categoria" :fields="catListFields" :rows="catsSorted" :readonly="!isAdmin" @changed="reload" />
 
     <Modal v-if="bulk !== null" title="Colar lista de lojas" wide @close="bulk = null">
       <p class="small muted" style="margin: 0">
         Copie da planilha as colunas <b>código, nome, cidade, UF</b> (nessa ordem) e cole abaixo. Uma loja por linha.
       </p>
+      <label v-if="isAdmin" class="f">Empresa (dono) dessas lojas
+        <select v-model="bulkCompany">
+          <option :value="null">Sem empresa</option>
+          <option v-for="c in app.data.value.companies" :key="c.id" :value="c.id">{{ c.name }}</option>
+        </select>
+      </label>
       <textarea v-model="bulk" rows="10" placeholder="EQ001	Subway Equilíbrio	Cidade	SP" />
       <p class="small"><b>{{ bulkRows.length }}</b> lojas reconhecidas.</p>
       <template #footer>

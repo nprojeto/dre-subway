@@ -19,21 +19,22 @@ const filtered = computed(() => {
   return list
 })
 const shown = computed(() => filtered.value.slice(0, 200))
-const selected = computed(() => new Set(props.modelValue))
+const val = computed(() => props.modelValue ?? [])
+const selected = computed(() => new Set(val.value))
 const summary = computed(() => {
-  const n = props.modelValue.length
+  const n = val.value.length
   if (!n) return props.allLabel ?? 'Todos'
-  if (n === 1) return props.options.find((o) => o.value === props.modelValue[0])?.label ?? '1 selecionado'
+  if (n === 1) return props.options.find((o) => o.value === val.value[0])?.label ?? '1 selecionado'
   return `${n} selecionados`
 })
 
 function toggle(v: string) {
   if (props.single) { emit('update:modelValue', [v]); open.value = false; return }
-  const s = new Set(props.modelValue)
+  const s = new Set(val.value)
   s.has(v) ? s.delete(v) : s.add(v)
   emit('update:modelValue', [...s])
 }
-const selectShown = () => emit('update:modelValue', [...new Set([...props.modelValue, ...filtered.value.map((o) => o.value)])])
+const selectShown = () => emit('update:modelValue', [...new Set([...val.value, ...filtered.value.map((o) => o.value)])])
 const clear = () => { emit('update:modelValue', []); if (props.single) open.value = false }
 
 const onDoc = (e: MouseEvent) => { if (root.value && !root.value.contains(e.target as Node)) open.value = false }
@@ -43,7 +44,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onDoc))
 
 <template>
   <div ref="root" class="ms">
-    <button type="button" class="ms-btn" :class="{ on: modelValue.length }" @click="open = !open">
+    <button type="button" class="ms-btn" :class="{ on: val.length }" @click="open = !open">
       <span class="ms-sum">{{ summary }}</span>
       <svg width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" /></svg>
     </button>
@@ -77,6 +78,6 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onDoc))
 .ms-list { max-height: 300px; overflow-y: auto; }
 .ms-item { display: flex; gap: 10px; align-items: center; padding: 7px 6px; border-radius: 6px; cursor: pointer; font-size: 14px; }
 .ms-item:hover { background: var(--green-soft); }
-.ms-item small { color: var(--muted); }
+.ms-item small { color: var(--muted); margin-left: 6px; }
 .ms-more { padding: 6px; }
 </style>

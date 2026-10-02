@@ -2,7 +2,10 @@ type AppData = {
   loaded: boolean
   profile: any
   isAdmin: boolean
+  isOwner: boolean
+  isManager: boolean
   canWrite: boolean
+  companies: any[]
   stores: any[]
   accounts: any[]
   banks: any[]
@@ -12,8 +15,8 @@ type AppData = {
 }
 
 const empty = (): AppData => ({
-  loaded: false, profile: null, isAdmin: false, canWrite: false,
-  stores: [], accounts: [], banks: [], groups: [], categories: [], settings: {},
+  loaded: false, profile: null, isAdmin: false, isOwner: false, isManager: false, canWrite: false,
+  companies: [], stores: [], accounts: [], banks: [], groups: [], categories: [], settings: {},
 })
 
 export const applyTheme = (settings: Record<string, any>) => {
@@ -39,6 +42,7 @@ export const useApp = () => {
 
   const by = (list: any[]) => Object.fromEntries(list.map((x) => [x.id, x]))
   const storeMap = computed(() => by(data.value.stores))
+  const companyMap = computed(() => by(data.value.companies ?? []))
   const accountMap = computed(() => by(data.value.accounts))
   const bankMap = computed(() => by(data.value.banks))
   const groupMap = computed(() => by(data.value.groups))
@@ -64,5 +68,5 @@ export const useApp = () => {
     return a.name
   }
 
-  return { data, load, reset, storeMap, accountMap, bankMap, groupMap, catMap, groupsSorted, catsOfGroup, catOptions, accountLabel }
+  return { data, load, reset, storeMap, companyMap, accountMap, bankMap, groupMap, catMap, groupsSorted, catsOfGroup, catOptions, accountLabel }
 }

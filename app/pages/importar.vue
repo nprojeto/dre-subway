@@ -100,9 +100,9 @@ const statusLabel: Record<string, [string, string]> = { lido: ['Não concluída'
 
     <div v-if="!result" class="grid" style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr)" :class="{ stack: true }">
       <div class="card up">
-        <label class="f">Conta do extrato
+        <div class="f">Conta do extrato
           <MultiSelect v-model="acc" :options="accountOpts" single all-label="Selecione a conta" placeholder="Buscar conta ou loja" />
-        </label>
+        </div>
         <p v-if="!accountOpts.length" class="small muted">Nenhuma conta cadastrada. <NuxtLink to="/cadastros?tab=contas">Cadastrar conta</NuxtLink></p>
 
         <label class="drop" :class="{ drag, has: file }" @dragover.prevent="drag = true" @dragleave="drag = false" @drop.prevent="drop">

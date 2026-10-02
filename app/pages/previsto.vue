@@ -89,9 +89,9 @@ const scopeText = computed(() => {
 
     <div class="card" style="margin-bottom: 16px">
       <div class="row">
-        <label class="f" style="min-width: 260px">Para qual loja
+        <div class="f" style="min-width: 260px">Para qual loja
           <MultiSelect v-model="store" :options="storeOpts" single all-label="Modelo padrão (todas as lojas)" placeholder="Buscar loja" />
-        </label>
+        </div>
         <label class="f">Para qual mês
           <div class="row" style="gap: 6px">
             <input v-model="month" type="month" style="width: 170px">
@@ -129,7 +129,7 @@ const scopeText = computed(() => {
     </div>
 
     <Modal v-if="copyFrom" title="Copiar previsto de" @close="copyFrom = null">
-      <label class="f">Loja<MultiSelect v-model="copyFrom.store" :options="storeOpts" single all-label="Modelo padrão (todas as lojas)" /></label>
+      <div class="f">Loja<MultiSelect v-model="copyFrom.store" :options="storeOpts" single all-label="Modelo padrão (todas as lojas)" /></div>
       <label class="f">Mês (vazio = todos os meses)<input v-model="copyFrom.month" type="month"></label>
       <template #footer>
         <button class="btn ghost" @click="copyFrom = null">Cancelar</button>

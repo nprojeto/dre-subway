@@ -15,16 +15,24 @@ const nav = computed(() => {
     { to: '/conciliacao', label: 'Conciliação', icon: 'check' },
     { to: '/previsto', label: 'Previsto', icon: 'target' },
     { to: '/cadastros', label: 'Cadastros', icon: 'box' },
-    { to: '/usuarios', label: 'Usuários', icon: 'users', admin: true },
+    { to: '/usuarios', label: 'Usuários', icon: 'users', manager: true },
     { to: '/parametros', label: 'Parâmetros', icon: 'gear', admin: true },
   ]
-  return items.filter((i) => (!i.admin || d.isAdmin) && (!i.write || d.canWrite))
+  return items.filter((i: any) => (!i.admin || d.isAdmin) && (!i.manager || d.isManager) && (!i.write || d.canWrite))
 })
 
 const brand = computed(() => app.data.value.settings?.app ?? {})
-const roleLabel: Record<string, string> = { admin: 'Administrador', gestor: 'Gestor', visualizador: 'Visualizador' }
+const roleLabel: Record<string, string> = { admin: 'Administrador geral', empresario: 'Empresário', gestor: 'Gestor', visualizador: 'Visualizador' }
+const { f } = useFilters()
+const currentStore = computed(() => {
+  const n = f.value.stores.length
+  if (n === 1) return app.storeMap.value[f.value.stores[0]]?.name ?? '1 loja'
+  if (n > 1) return `${n} lojas selecionadas`
+  return app.data.value.stores.length > 1 ? 'Todas as minhas lojas' : (app.data.value.stores[0]?.name ?? 'Nenhuma loja')
+})
 
 async function logout() {
+  try { sessionStorage.removeItem('loja-ok') } catch {}
   await useSupabase()?.auth.signOut()
   app.reset()
   navigateTo('/login')
@@ -35,10 +43,14 @@ async function logout() {
   <div class="shell">
     <aside class="side" :class="{ open: menuOpen }">
       <div class="brand">
-        <div class="brand-card"><LogoRotator :extra="brand.logo" :height="56" /></div>
+        <div class="brand-card"><LogoRotator :extra="brand.logo" :height="40" /></div>
         <strong>{{ brand.name || 'DRE SUBWAY' }}</strong>
-        <small>{{ brand.subtitle || 'O controle da sua loja na palma da mão' }}</small>
       </div>
+      <NuxtLink to="/selecionar-loja" class="store-sw" title="Trocar de loja">
+        <small>Operando em</small>
+        <strong>{{ currentStore }}</strong>
+        <span>Trocar</span>
+      </NuxtLink>
       <nav>
         <NuxtLink v-for="i in nav" :key="i.to" :to="i.to" class="nav-i" :class="{ on: route.path === i.to }">
           <Icon :name="i.icon" /> {{ i.label }}
@@ -63,13 +75,18 @@ async function logout() {
 
 <style scoped>
 .shell { display: flex; min-height: 100vh; }
-.side { width: 248px; flex: none; background: var(--green-dark); color: #fff; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; padding: 18px 12px; }
-.brand { padding: 2px 6px 20px; }
-.brand-card { background: #fff; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; }
+.side { width: 248px; flex: none; background: var(--green-dark); color: #fff; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; padding: 16px 12px; overflow-y: auto; }
+.brand { padding: 0 4px 12px; }
+.brand-card { background: #fff; border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; }
 .brand strong { display: block; font-family: var(--display); font-size: 22px; line-height: 1.1; letter-spacing: .5px; }
 .brand small { color: rgba(255,255,255,.65); font-size: 12.5px; line-height: 1.3; display: block; margin-top: 2px; }
-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-y: auto; }
-.nav-i { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,.78); font-weight: 500; position: relative; }
+nav { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+.store-sw { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 9px 12px; margin: 0 0 12px; color: #fff; }
+.store-sw:hover { background: rgba(255,255,255,.14); }
+.store-sw small { grid-column: 1; color: rgba(255,255,255,.6); font-size: 11.5px; }
+.store-sw strong { grid-column: 1; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.store-sw span { grid-column: 2; grid-row: 1 / 3; font-size: 12.5px; font-weight: 700; color: var(--green-dark); background: var(--yellow); padding: 4px 10px; border-radius: 99px; }
+.nav-i { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: rgba(255,255,255,.78); font-weight: 500; position: relative; }
 .nav-i:hover { background: rgba(255,255,255,.07); color: #fff; }
 .nav-i.on { background: rgba(255,255,255,.1); color: #fff; font-weight: 600; }
 .nav-i.on::before { content: ''; position: absolute; left: -12px; top: 8px; bottom: 8px; width: 5px; border-radius: 0 5px 5px 0; background: var(--yellow); }

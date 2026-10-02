@@ -23,6 +23,7 @@ const props = defineProps<{
   rows: any[]
   readonly?: boolean
   defaults?: Record<string, any>
+  newLabel?: string
 }>()
 const emit = defineEmits(['changed'])
 const api = useApi()
@@ -65,6 +66,7 @@ function openNew() {
   const o: any = {}
   props.fields.forEach((f) => (o[f.key] = f.default ?? (f.type === 'bool' ? true : f.type === 'tags' ? '' : null)))
   Object.assign(o, props.defaults ?? {})
+  o._store = o.store_id ? [o.store_id] : []
   editing.value = o
 }
 function openEdit(row: any) {
@@ -107,12 +109,6 @@ async function remove(row: any) {
   } catch (err: any) { toast.bad(err) }
 }
 
-async function toggleActive(row: any) {
-  try {
-    await api.patch(`/crud/${props.table}/${row.id}`, { active: !row.active })
-    emit('changed')
-  } catch (err: any) { toast.bad(err) }
-}
 </script>
 
 <template>
@@ -125,7 +121,7 @@ async function toggleActive(row: any) {
       <span class="muted small">{{ filtered.length }} {{ filtered.length === 1 ? 'item' : 'itens' }}</span>
       <div class="spacer" />
       <slot name="actions" />
-      <button v-if="!readonly" class="btn" @click="openNew">+ Novo(a) {{ singular.toLowerCase() }}</button>
+      <button v-if="!readonly" class="btn" @click="openNew">+ {{ newLabel ?? `Novo ${singular.toLowerCase()}` }}</button>
     </div>
 
     <div class="table-wrap">
@@ -140,9 +136,7 @@ async function toggleActive(row: any) {
           <tr v-for="r in shown" :key="r.id" :style="{ opacity: r.active === false ? .55 : 1 }">
             <td v-for="f in listFields" :key="f.key" :class="{ num: f.type === 'money' || f.type === 'number' }">
               <template v-if="f.key === 'active'">
-                <button class="badge" :class="r.active ? 'ok' : ''" :disabled="readonly" style="border:0;cursor:pointer" @click="toggleActive(r)">
-                  {{ r.active ? 'Ativo' : 'Inativo' }}
-                </button>
+                <span class="badge" :class="r.active ? 'ok' : ''">{{ r.active ? 'Ativo' : 'Inativo' }}</span>
               </template>
               <template v-else-if="f.type === 'color'"><span class="dot" :style="{ background: r[f.key] }" /></template>
               <template v-else>{{ display(r, f) }}</template>
@@ -156,7 +150,7 @@ async function toggleActive(row: any) {
       </table>
       <div v-if="!filtered.length" class="empty">
         <h3>Nada por aqui</h3>
-        <p>{{ readonly ? 'Nenhum registro.' : `Clique em "Novo(a) ${singular.toLowerCase()}" para cadastrar.` }}</p>
+        <p>{{ readonly ? 'Nenhum registro.' : 'Clique no botão verde para cadastrar.' }}</p>
       </div>
     </div>
     <div v-if="filtered.length > PAGE" class="row" style="justify-content: center; margin-top: 12px">
@@ -165,23 +159,23 @@ async function toggleActive(row: any) {
       <button class="btn ghost sm" :disabled="(page + 1) * PAGE >= filtered.length" @click="page++">Próxima</button>
     </div>
 
-    <Modal v-if="editing" :title="editing.id ? `Editar ${singular.toLowerCase()}` : `Novo(a) ${singular.toLowerCase()}`" @close="editing = null">
+    <Modal v-if="editing" :title="editing.id ? `Editar ${singular.toLowerCase()}` : (newLabel ?? `Novo ${singular.toLowerCase()}`)" @close="editing = null">
       <div class="grid g2">
-        <label v-for="f in fields" :key="f.key" class="f" :style="{ gridColumn: f.half ? 'auto' : '1 / -1' }">
+        <div v-for="f in fields" :key="f.key" class="f" :style="{ gridColumn: f.half ? 'auto' : '1 / -1' }">
           <span v-if="f.type !== 'bool'">{{ f.label }}{{ f.required ? ' *' : '' }}</span>
           <select v-if="f.type === 'select'" v-model="editing[f.key]">
             <option :value="null">Selecione...</option>
             <option v-for="o in f.options" :key="o.value" :value="o.value">{{ o.label }}</option>
           </select>
           <MultiSelect v-else-if="f.type === 'store'" v-model="editing._store" :options="storeOpts" single all-label="Selecione a loja" />
-          <span v-else-if="f.type === 'bool'" class="row" style="gap: 8px; color: var(--ink)">
+          <label v-else-if="f.type === 'bool'" class="row" style="gap: 8px; color: var(--ink); cursor: pointer">
             <input v-model="editing[f.key]" type="checkbox"> {{ f.label }}
-          </span>
+          </label>
           <input v-else-if="f.type === 'color'" v-model="editing[f.key]" type="color">
           <input v-else-if="f.type === 'number' || f.type === 'money'" v-model="editing[f.key]" type="number" step="0.01">
           <input v-else v-model="editing[f.key]" type="text">
           <small v-if="f.help" class="muted" style="font-weight: 400">{{ f.help }}</small>
-        </label>
+        </div>
       </div>
       <template #footer>
         <button class="btn ghost" @click="editing = null">Cancelar</button>

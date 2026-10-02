@@ -32,13 +32,13 @@ h3 { font-size: 17px; font-weight: 600; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
 /* ============ Formulários ============ */
-label.f { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.f { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); }
 input, select, textarea {
   font: inherit; color: var(--ink); background: #fff; border: 1.5px solid var(--line);
   border-radius: var(--radius-sm); padding: 9px 11px; min-height: 40px; width: 100%;
 }
 input:focus, select:focus, textarea:focus { border-color: var(--green); outline: none; box-shadow: 0 0 0 3px var(--green-soft); }
-input[type=checkbox] { width: 18px; height: 18px; min-height: 0; accent-color: var(--green); }
+input[type=checkbox], input[type=radio] { width: 18px; height: 18px; min-height: 0; padding: 0; flex: none; accent-color: var(--green); }
 input[type=color] { padding: 2px; height: 40px; }
 textarea { min-height: 90px; resize: vertical; }
 

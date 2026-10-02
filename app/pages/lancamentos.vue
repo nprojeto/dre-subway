@@ -200,7 +200,7 @@ watch(() => editing.value?.direction, (d, old) => {
         <button :class="{ on: editing.direction === 'entrada' }" @click="editing.direction = 'entrada'">Entrada</button>
         <button :class="{ on: editing.direction === 'saida' }" @click="editing.direction = 'saida'">Saída</button>
       </div>
-      <label class="f">Conta *<MultiSelect v-model="editing._acc" :options="accountOpts" single all-label="Selecione a conta" /></label>
+      <div class="f">Conta *<MultiSelect v-model="editing._acc" :options="accountOpts" single all-label="Selecione a conta" /></div>
       <div class="grid g2">
         <label class="f">Data *<input v-model="editing.date" type="date"></label>
         <label class="f">Valor (R$) *<input v-model="editing.amount" inputmode="decimal" placeholder="0,00"></label>
