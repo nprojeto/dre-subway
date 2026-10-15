@@ -6,7 +6,7 @@ const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', '
 export const money = (v: number | null | undefined) => (v === null || v === undefined || isNaN(v) ? '—' : brl.format(v))
 export const moneyShort = (v: number) => 'R$ ' + brlShort.format(v)
 export const number2 = (v: number | null | undefined) => (v === null || v === undefined ? '' : num.format(v))
-export const pct = (v: number | null | undefined, d = 1) =>
+export const pct = (v: number | null | undefined, d = 2) =>
   v === null || v === undefined || !isFinite(v) ? '—' : `${(v * 100).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d })}%`
 export const dateBR = (d?: string | null) => (d ? d.slice(0, 10).split('-').reverse().join('/') : '')
 export const dayLabel = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`

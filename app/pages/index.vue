@@ -68,7 +68,26 @@ const donut = computed(() => ({
   },
   options: {
     maintainAspectRatio: false, cutout: '64%',
-    plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c: any) => `${c.label}: ${money(c.raw)}` } } },
+    plugins: {
+      sliceLabels: { display: true },
+      legend: {
+        position: 'bottom',
+        labels: {
+          generateLabels: (ch: any) => {
+            const d = ch.data.datasets[0].data as number[]
+            const tot = d.reduce((s, v) => s + v, 0) || 1
+            return ch.data.labels.map((l: string, i: number) => ({
+              text: `${l} ${pct(d[i] / tot)}`, fillStyle: ch.data.datasets[0].backgroundColor[i],
+              strokeStyle: '#fff', pointStyle: 'circle', hidden: !ch.getDataVisibility(i), index: i,
+            }))
+          },
+        },
+      },
+      tooltip: { callbacks: { label: (c: any) => {
+        const tot = (c.dataset.data as number[]).reduce((s, v) => s + v, 0) || 1
+        return `${c.label}: ${money(c.raw)} (${pct(c.raw / tot)})`
+      } } },
+    },
   },
 }) as any)
 
@@ -170,7 +189,7 @@ const periodLabel = computed(() => range.value.months.length === 1 ? monthLong(r
               <span class="chip"><span class="dot" :style="{ background: t.g.color }" />{{ t.g.name }}</span>
               <div class="spacer" />
               <b :class="t.p !== null && t.p > t.t ? 'neg' : 'pos'">{{ pct(t.p) }}</b>
-              <span class="small muted">meta {{ pct(t.t, 0) }}</span>
+              <span class="small muted">meta {{ pct(t.t) }}</span>
             </div>
             <div class="bar-track">
               <div class="bar-fill" :style="{ width: Math.min(100, ((t.p ?? 0) / Math.max(t.t, .0001)) * 100) + '%', background: t.p !== null && t.p > t.t ? 'var(--red)' : 'var(--green)' }" />

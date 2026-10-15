@@ -15,7 +15,7 @@ function exportCsv() {
   if (!r.value) return
   const rows: any[][] = [['Descrição', 'Previsto', '% prev.', 'Realizado', '% receita', 'Meta %', 'Variação']]
   const line = (label: string, prev: number, real: number, meta: any = '') =>
-    rows.push([label, prev, recPrev.value ? (prev / recPrev.value * 100).toFixed(1) + '%' : '', real, rec.value ? (real / rec.value * 100).toFixed(1) + '%' : '', meta, real - prev])
+    rows.push([label, prev, recPrev.value ? (prev / recPrev.value * 100).toFixed(2).replace('.', ',') + '%' : '', real, rec.value ? (real / rec.value * 100).toFixed(2).replace('.', ',') + '%' : '', meta, real - prev])
   const groups = (k: string, prefix: string) => byKind(k).forEach((g) => {
     line(`${prefix} ${g.group.name}`, g.prev, g.real, g.group.target_pct ?? '')
     g.items.forEach((i) => (i.prev || i.real) && line(`      ${i.cat.name}`, i.prev, i.real))
@@ -81,7 +81,7 @@ function exportCsv() {
                   <td class="num">
                     <b :class="g.group.target_pct != null && sec.kind !== 'receita' && (p(g.real, rec) ?? 0) * 100 > g.group.target_pct ? 'neg' : ''">{{ pct(p(g.real, rec)) }}</b>
                   </td>
-                  <td class="num muted">{{ g.group.target_pct != null ? pct(g.group.target_pct / 100, 0) : '' }}</td>
+                  <td class="num muted">{{ g.group.target_pct != null ? pct(g.group.target_pct / 100) : '' }}</td>
                   <td class="num" :class="(sec.kind === 'receita' ? g.real - g.prev : g.prev - g.real) >= 0 ? 'pos' : 'neg'">{{ money(g.real - g.prev) }}</td>
                 </tr>
                 <template v-if="isOpen(g.group.id)">

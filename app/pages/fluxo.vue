@@ -68,7 +68,7 @@ function exportCsv() {
     : ['Descrição', ...buckets.value.map(colLabel), 'Total']
   const rows: any[][] = [head]
   const push = (label: string, l: { prev: number; real: number; cols: number[] }) => rows.push(
-    mode.value === 'resumo' ? [label, l.prev, l.real, l.real - l.prev, share(l.real) === null ? '' : (share(l.real)! * 100).toFixed(1) + '%'] : [label, ...l.cols, l.real])
+    mode.value === 'resumo' ? [label, l.prev, l.real, l.real - l.prev, share(l.real) === null ? '' : (share(l.real)! * 100).toFixed(2).replace('.', ',') + '%'] : [label, ...l.cols, l.real])
   rows.push(['ENTRADAS']); ent.value.lines.forEach((l) => push(l.kind === 'cat' ? '   ' + l.label : l.label, l))
   if (ent.value.total) push('TOTAL DE ENTRADAS', ent.value.total)
   rows.push(['SAÍDAS']); sai.value.lines.forEach((l) => push(l.kind === 'cat' ? '   ' + l.label : l.label, l))
